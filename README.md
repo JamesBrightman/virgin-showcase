@@ -4,6 +4,10 @@ An internal, lightweight wall for reviewing selected Virgin Atlantic and related
 
 Each card starts as a local thumbnail. The live platform embed is requested only when a visitor opens a card, keeping the initial page small and fast.
 
+## Live site
+
+[View the Virgin Showcase](https://jamesbrightman.github.io/virgin-showcase/)
+
 ## Run locally
 
 ```bash
