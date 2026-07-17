@@ -12,6 +12,8 @@ const root = process.cwd();
 const postsPath = path.join(root, 'src', 'posts.ts');
 const thumbsPath = path.join(root, 'public', 'thumbs');
 const userAgent = 'Mozilla/5.0 (compatible; VirginShowcaseBot/1.0)';
+const instagramAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+const instagramEpoch = 1293840000000;
 
 function formValue(label) {
   const body = process.env.ISSUE_BODY ?? '';
@@ -30,6 +32,44 @@ function decodeHtml(value) {
 
 function cleanText(value, limit = 280) {
   return decodeHtml(value).replace(/\s+/g, ' ').trim().slice(0, limit);
+}
+
+function validPublishedDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? '' : value;
+}
+
+function dateFromTikTokUrl(sourceUrl) {
+  const videoId = new URL(sourceUrl).pathname.match(/\/video\/(\d+)/)?.[1];
+  if (!videoId) return '';
+  const timestamp = Number(BigInt(videoId) >> 32n) * 1000;
+  const date = new Date(timestamp);
+  return date.getUTCFullYear() >= 2016 && date <= new Date() ? date.toISOString().slice(0, 10) : '';
+}
+
+function dateFromInstagramUrl(sourceUrl) {
+  const shortcode = new URL(sourceUrl).pathname.match(/\/(?:p|reel)\/([^/]+)/)?.[1];
+  if (!shortcode || !/^[A-Za-z0-9_-]+$/.test(shortcode)) return '';
+  let mediaId = 0n;
+  for (const character of shortcode) mediaId = mediaId * 64n + BigInt(instagramAlphabet.indexOf(character));
+  const date = new Date(Number(mediaId >> 23n) + instagramEpoch);
+  return date.getUTCFullYear() >= 2011 && date <= new Date() ? date.toISOString().slice(0, 10) : '';
+}
+
+function dateFromPage(page) {
+  const values = [
+    metaValue(page, 'article:published_time'),
+    metaValue(page, 'published_time'),
+    metaValue(page, 'datePublished'),
+    page.match(/"(?:uploadDate|datePublished)"\s*:\s*"([^"\\]+)"/i)?.[1] ?? '',
+    page.match(/<time[^>]+datetime=["']([^"']+)/i)?.[1] ?? '',
+  ];
+  for (const value of values) {
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
+  }
+  return '';
 }
 
 function titleFromText(value) {
@@ -108,7 +148,10 @@ async function metadataFor(platform, sourceUrl) {
     const { response: pageResponse } = await fetchPublic(sourceUrl);
     const page = await pageResponse.text();
     const description = cleanText(page.match(/"desc":"([^"]+)"/)?.[1] ?? oembed.title ?? '');
-    return { title: titleFromText(description), summary: description, thumbnailUrl: oembed.thumbnail_url, aspectRatio: '9 / 16' };
+    return {
+      title: titleFromText(description), summary: description, thumbnailUrl: oembed.thumbnail_url,
+      aspectRatio: '9 / 16', publishedAt: dateFromTikTokUrl(sourceUrl) || dateFromPage(page),
+    };
   }
 
   const { response, url } = await fetchPublic(sourceUrl);
@@ -120,7 +163,11 @@ async function metadataFor(platform, sourceUrl) {
   const aspectRatio = platform === 'instagram'
     ? (url.includes('/reel/') ? '4 / 5' : '1 / 1')
     : (url.includes('/reel/') ? '9 / 16' : '4 / 5');
-  return { title: titleFromText(ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio };
+  const platformDate = platform === 'instagram' ? dateFromInstagramUrl(sourceUrl) : '';
+  return {
+    title: titleFromText(ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio,
+    publishedAt: platformDate || dateFromPage(page),
+  };
 }
 
 async function downloadThumbnail(url, id) {
@@ -151,10 +198,13 @@ async function downloadThumbnail(url, id) {
 const sourceUrl = formValue('Post URL');
 const selectedPlatform = formValue('Platform');
 const facebookEmbedCode = formValue('Facebook embed code (optional)');
+const suppliedPublishedAt = formValue('Published date (optional)');
 if (!sourceUrl) throw new Error('A post URL is required.');
 
 const platform = platformFromUrl(sourceUrl, selectedPlatform);
 const metadata = await metadataFor(platform, sourceUrl);
+const publishedAt = suppliedPublishedAt ? validPublishedDate(suppliedPublishedAt) : metadata.publishedAt;
+if (suppliedPublishedAt && !publishedAt) throw new Error('Published date must use YYYY-MM-DD.');
 const id = `${platform}-${createHash('sha256').update(sourceUrl).digest('hex').slice(0, 10)}`;
 const thumbnail = await downloadThumbnail(metadata.thumbnailUrl, id);
 const embedUrl = platform === 'facebook' ? iframeSource(facebookEmbedCode) : '';
@@ -162,7 +212,7 @@ const postsFile = await readFile(postsPath, 'utf8');
 
 if (postsFile.includes(`id: '${id}'`)) throw new Error('This post has already been added.');
 
-const postSource = `  {\n    id: '${id}',\n    platform: '${platform}',\n    url: ${JSON.stringify(sourceUrl)},\n    title: ${JSON.stringify(metadata.title)},\n    summary: ${JSON.stringify(metadata.summary)},\n    aspectRatio: '${metadata.aspectRatio}',\n    thumbnail: '${thumbnail}',${embedUrl ? `\n    embedUrl: ${JSON.stringify(embedUrl)},` : ''}\n  },\n`;
+const postSource = `  {\n    id: '${id}',\n    platform: '${platform}',\n    url: ${JSON.stringify(sourceUrl)},\n    title: ${JSON.stringify(metadata.title)},\n    summary: ${JSON.stringify(metadata.summary)},${publishedAt ? `\n    publishedAt: '${publishedAt}',` : ''}\n    aspectRatio: '${metadata.aspectRatio}',\n    thumbnail: '${thumbnail}',${embedUrl ? `\n    embedUrl: ${JSON.stringify(embedUrl)},` : ''}\n  },\n`;
 
 const marker = '];\n';
 const position = postsFile.lastIndexOf(marker);

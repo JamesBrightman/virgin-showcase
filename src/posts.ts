@@ -6,6 +6,7 @@ export type SocialPost = {
   url: string;
   title: string;
   summary: string;
+  publishedAt?: string;
   aspectRatio: `${number} / ${number}`;
   thumbnail?: string;
   embedUrl?: string;
@@ -22,6 +23,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.tiktok.com/@virginatlantic/video/7660474926704381206?_r=1&_t=ZN-97t3a5BJKic',
     title: "London meets Korea's favourite Grandma",
     summary: "From Seoul to Shoreditch, @korea_grandma and friends are swapping their home turf for London's streets and sightseeing before opening the doors to Heart + Seoul.",
+    publishedAt: '2026-07-09',
     aspectRatio: '9 / 16',
     thumbnail: '/thumbs/virgin-atlantic-tiktok.jpg',
   },
@@ -31,6 +33,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.instagram.com/reel/Da0ncS4uJIj/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
     title: 'Cleared for kick-off',
     summary: 'Our Heathrow team gained a few new team mates with expert luggage handling and slick footwork for celebration worthy checkin. Atlanta is calling, whether you are stateside or cheering from home: come on England.',
+    publishedAt: '2025-11-21',
     aspectRatio: '4 / 5',
     thumbnail: '/thumbs/virgin-atlantic-instagram.jpg',
   },
@@ -40,6 +43,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.tiktok.com/@virginatlantic/video/7644299197696445718?_r=1&_t=ZN-97t3a5BJKic',
     title: 'Sugababes live at 35,000 ft',
     summary: 'Relive Sugababes live somewhere between London and New York. Round Round at cruising altitude, powered by Starlink Wi-Fi.',
+    publishedAt: '2026-05-26',
     aspectRatio: '9 / 16',
     thumbnail: '/thumbs/virgin-atlantic-sugababes-tiktok.jpg',
   },
@@ -49,6 +53,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.tiktok.com/@pestxterminators/video/7660069462686649608?_r=1&_t=ZN-97t3a5BJKic',
     title: 'How mice get inside',
     summary: 'Tiny gaps around pipes, foundations, and doors can be enough for mice to move in. Finding how they got in helps stop the problem returning.',
+    publishedAt: '2026-07-08',
     aspectRatio: '9 / 16',
     thumbnail: '/thumbs/pestxterminators-tiktok.jpg',
   },
@@ -58,6 +63,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.instagram.com/p/DarvE1uOPL3/',
     title: 'The journey continues',
     summary: 'One step closer. Wilbur and Orville are enjoying the ride a little longer. After all, a pinch of confidence never hurt anyone.',
+    publishedAt: '2025-11-18',
     aspectRatio: '1 / 1',
     thumbnail: '/thumbs/virgin-atlantic-journey-instagram.jpg',
   },
@@ -67,6 +73,7 @@ export const posts: SocialPost[] = [
     url: 'https://www.instagram.com/p/DavMERHlgum/?img_index=1',
     title: 'A warm London welcome',
     summary: 'Three days beside Tower Bridge, thousands of visitors, and a full-scale model of Joby’s electric air taxi meeting the city with Virgin Atlantic.',
+    publishedAt: '2025-11-19',
     aspectRatio: '1 / 1',
     thumbnail: '/thumbs/joby-aviation-instagram.jpg',
   },
@@ -96,6 +103,7 @@ export const posts: SocialPost[] = [
     url: "https://www.tiktok.com/@virginatlantic/video/7583795264217976086?_r=1",
     title: "A free photobooth worth the hype 📸 Our photobooth at SKATE @somersethouse never misses.",
     summary: "A free photobooth worth the hype 📸 Our photobooth at SKATE @somersethouse never misses. This is one for your festive bucket list.",
+    publishedAt: '2025-12-14',
     aspectRatio: '9 / 16',
     thumbnail: '/thumbs/tiktok-21f4c762d9.jpg',
   },

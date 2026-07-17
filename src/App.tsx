@@ -18,11 +18,20 @@ function filterFromUrl(): 'all' | Platform {
     : 'all';
 }
 
+function monthFromUrl() {
+  const month = new URLSearchParams(window.location.search).get('month');
+  return month && /^\d{4}-\d{2}$/.test(month) ? month : '';
+}
+
 export default function App() {
   const [filter, setFilter] = useState<'all' | Platform>(filterFromUrl);
+  const [month, setMonth] = useState(monthFromUrl);
 
   useEffect(() => {
-    const updateFilter = () => setFilter(filterFromUrl());
+    const updateFilter = () => {
+      setFilter(filterFromUrl());
+      setMonth(monthFromUrl());
+    };
 
     window.addEventListener('popstate', updateFilter);
     return () => window.removeEventListener('popstate', updateFilter);
@@ -41,9 +50,25 @@ export default function App() {
     setFilter(nextFilter);
   };
 
+  const selectMonth = (nextMonth: string) => {
+    const url = new URL(window.location.href);
+
+    if (nextMonth) {
+      url.searchParams.set('month', nextMonth);
+    } else {
+      url.searchParams.delete('month');
+    }
+
+    window.history.pushState({}, '', url);
+    setMonth(nextMonth);
+  };
+
   const visiblePosts = useMemo(
-    () => (filter === 'all' ? posts : posts.filter((post) => post.platform === filter)),
-    [filter],
+    () => posts.filter((post) => (
+      (filter === 'all' || post.platform === filter)
+      && (!month || post.publishedAt?.startsWith(month))
+    )),
+    [filter, month],
   );
 
   return (
@@ -55,25 +80,32 @@ export default function App() {
         </p>
       </header>
 
-      <nav className="filters" aria-label="Filter social posts">
-        {filters.map((item) => (
-          <button
-            key={item.value}
-            className={filter === item.value ? 'filter active' : 'filter'}
-            type="button"
-            aria-pressed={filter === item.value}
-            onClick={() => selectFilter(item.value)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
+      <div className="filter-bar">
+        <nav className="filters" aria-label="Filter social posts">
+          {filters.map((item) => (
+            <button
+              key={item.value}
+              className={filter === item.value ? 'filter active' : 'filter'}
+              type="button"
+              aria-pressed={filter === item.value}
+              onClick={() => selectFilter(item.value)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <label className="month-filter">
+          <span>Month</span>
+          <input type="month" value={month} onChange={(event) => selectMonth(event.target.value)} />
+        </label>
+      </div>
 
       <section className="wall" aria-live="polite">
         {visiblePosts.map((post) => (
           <SocialCard key={post.id} post={post} />
         ))}
       </section>
+      {visiblePosts.length === 0 && <p className="empty-state">No posts match this filter.</p>}
     </main>
   );
 }
