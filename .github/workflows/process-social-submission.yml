@@ -45,7 +45,7 @@ jobs:
         run: node scripts/process-social-submission.mjs
       - name: Create review pull request
         id: create-pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: social-submission/issue-${{ github.event.issue.number }}
           delete-branch: true
