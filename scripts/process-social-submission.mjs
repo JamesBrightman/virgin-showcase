@@ -62,7 +62,8 @@ function validImageUrl(value) {
   const url = new URL(value);
   const hostname = url.hostname.toLowerCase();
   const approved = url.protocol === 'https:' && (
-    hostname.endsWith('.tiktokcdn.com') || hostname.endsWith('.muscdn.com') ||
+    hostname.endsWith('.tiktokcdn.com') || hostname.endsWith('.tiktokcdn-eu.com') ||
+    hostname.endsWith('.tiktokcdn-us.com') || hostname.endsWith('.muscdn.com') ||
     hostname.endsWith('.cdninstagram.com') || hostname.endsWith('.fbcdn.net')
   );
   if (!approved) throw new Error('The platform returned an unapproved preview-image host.');
