@@ -54,6 +54,8 @@ jobs:
           body: |
             Generated from #${{ github.event.issue.number }}.
 
+            Closes #${{ github.event.issue.number }}.
+
             Please verify the title, description, thumbnail, and embed before merging.
       - uses: actions/github-script@v7
         with:
