@@ -11,6 +11,10 @@ const platformLabel = {
   facebook: 'Facebook',
 } as const;
 
+function publicAsset(path: string) {
+  return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+}
+
 export function SocialCard({ post }: { post: SocialPost }) {
   const [active, setActive] = useState(false);
 
@@ -34,7 +38,7 @@ export function SocialCard({ post }: { post: SocialPost }) {
           </div>
           <span className="card-copy">
             <span className="platform" aria-label={platformLabel[post.platform]}>
-              <img src={`/icons/${post.platform}.svg`} alt="" />
+              <img src={publicAsset(`/icons/${post.platform}.svg`)} alt="" />
             </span>
             <strong>{post.title}</strong>
             <span className="summary">{post.summary}</span>
@@ -47,7 +51,7 @@ export function SocialCard({ post }: { post: SocialPost }) {
 
 function PosterVisual({ post }: { post: SocialPost }) {
   return post.thumbnail ? (
-    <img src={post.thumbnail} alt="" loading="lazy" decoding="async" />
+    <img src={publicAsset(post.thumbnail)} alt="" loading="lazy" decoding="async" />
   ) : (
     <div className="generated-poster" aria-hidden="true">
       <span>{platformLabel[post.platform]}</span>

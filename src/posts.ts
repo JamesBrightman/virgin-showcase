@@ -13,7 +13,8 @@ export type SocialPost = {
 };
 
 // Add optional, compressed thumbnails under public/thumbs for the lightest
-// initial load, then set thumbnail to a path such as /thumbs/post.webp.
+// initial load, then set thumbnail to a root-relative path such as
+// /thumbs/post.webp. The card component applies Vite's deployment base path.
 export const posts: SocialPost[] = [
   {
     id: 'virgin-atlantic-tiktok',
