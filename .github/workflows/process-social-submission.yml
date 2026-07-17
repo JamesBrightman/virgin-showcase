@@ -2,7 +2,7 @@ name: Process social submission
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 permissions:
   contents: write
@@ -12,7 +12,7 @@ permissions:
 jobs:
   reject-untrusted:
     if: >-
-      contains(github.event.issue.labels.*.name, 'social-submission') &&
+      startsWith(github.event.issue.title, 'Add social post:') &&
       !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +34,7 @@ jobs:
 
   create-review:
     if: >-
-      contains(github.event.issue.labels.*.name, 'social-submission') &&
+      startsWith(github.event.issue.title, 'Add social post:') &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association)
     runs-on: ubuntu-latest
     steps:

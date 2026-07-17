@@ -1,7 +1,6 @@
 name: Add social post
 description: Submit a public TikTok, Instagram, or Facebook post for the showcase.
 title: "Add social post: "
-labels: [social-submission]
 body:
   - type: markdown
     attributes:
