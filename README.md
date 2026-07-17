@@ -19,7 +19,11 @@ npm run build
 
 ## Add content
 
-Add a post to `src/posts.ts` with its platform, public URL, title, description, aspect ratio, and local thumbnail path.
+Invited GitHub collaborators should use the repository's **Add social post** issue form. The automation accepts a public TikTok, Instagram, or Facebook URL; it fetches public metadata and a thumbnail, then opens a reviewable pull request.
+
+Only repository owners, members, and collaborators can trigger this automation. Other submissions are closed automatically.
+
+Posts can also be added directly to `src/posts.ts` when needed, with a platform, public URL, title, description, aspect ratio, and local thumbnail path.
 
 Store thumbnails in `public/thumbs/` and reference them with a root-relative path:
 
@@ -28,6 +32,8 @@ thumbnail: '/thumbs/my-post.jpg'
 ```
 
 For most Facebook posts, use the public post URL. Some Facebook Reels require a plugin embed URL; supply it through the optional `embedUrl` field when needed.
+
+The issue form includes an optional Facebook iframe field for these cases.
 
 ## Filtering
 

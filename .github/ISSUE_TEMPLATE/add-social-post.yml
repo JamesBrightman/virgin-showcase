@@ -1,0 +1,44 @@
+name: Add social post
+description: Submit a public TikTok, Instagram, or Facebook post for the showcase.
+title: "Add social post: "
+labels: [social-submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste a public post URL below. The showcase automation will collect its public title, description, and thumbnail, then open a reviewable pull request.
+  - type: input
+    id: post_url
+    attributes:
+      label: Post URL
+      description: TikTok, Instagram, or Facebook public/share URL.
+      placeholder: https://...
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Auto detect
+        - TikTok
+        - Instagram
+        - Facebook
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: facebook_embed
+    attributes:
+      label: Facebook embed code (optional)
+      description: Paste the iframe code only when a Facebook share URL does not embed correctly.
+      placeholder: <iframe src="https://www.facebook.com/plugins/post.php?...">
+    validations:
+      required: false
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes (optional)
+      description: Add any useful context for the reviewer.
+    validations:
+      required: false
