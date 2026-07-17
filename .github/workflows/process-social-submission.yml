@@ -50,7 +50,7 @@ jobs:
           branch: social-submission/issue-${{ github.event.issue.number }}
           delete-branch: true
           commit-message: Add social post from issue #${{ github.event.issue.number }}
-          title: Add social post from issue #${{ github.event.issue.number }}
+          title: ${{ github.event.issue.title }}
           body: |
             Generated from #${{ github.event.issue.number }}.
 
