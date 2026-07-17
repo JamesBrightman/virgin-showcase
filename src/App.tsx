@@ -94,10 +94,22 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <label className="month-filter">
-          <span>Month</span>
-          <input type="month" value={month} onChange={(event) => selectMonth(event.target.value)} />
-        </label>
+        <div className="month-filter">
+          <label className="month-field">
+            <span className="month-field-label">Filter by month</span>
+            <span className="month-field-control">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 2v3M17 2v3M3.5 9.5h17M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V6A1.5 1.5 0 0 1 5 4.5Z" />
+              </svg>
+              <input type="month" value={month} onChange={(event) => selectMonth(event.target.value)} />
+            </span>
+          </label>
+          {month && (
+            <button className="clear-month" type="button" onClick={() => selectMonth('')}>
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       <section className="wall" aria-live="polite">

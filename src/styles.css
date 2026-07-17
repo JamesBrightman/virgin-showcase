@@ -43,8 +43,24 @@ h1 {
   cursor: pointer;
 }
 .filter:hover, .filter.active { border-color: #171717; background: #171717; color: white; }
-.month-filter { display: inline-flex; align-items: center; gap: 8px; color: #585858; font-size: .9rem; }
-.month-filter input { border: 1px solid #d7d3cb; border-radius: 999px; padding: 8px 11px; background: rgba(255,255,255,.55); color: #171717; }
+.month-filter { display: inline-flex; align-items: center; gap: 8px; }
+.month-field {
+  min-width: 190px;
+  padding: 7px 12px 8px;
+  border: 1px solid #918f8a;
+  border-radius: 12px;
+  background: #fff;
+  color: #4a4742;
+  cursor: text;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.month-field:focus-within { border-color: #c8102e; box-shadow: 0 0 0 3px rgba(200,16,46,.16); }
+.month-field-label { display: block; margin-bottom: 1px; color: #6b6862; font-size: .72rem; font-weight: 700; letter-spacing: .02em; }
+.month-field-control { display: flex; align-items: center; gap: 8px; }
+.month-field-control svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.month-field input { width: 100%; border: 0; outline: 0; padding: 0; background: transparent; color: #171717; font: inherit; }
+.clear-month { border: 0; padding: 8px; background: transparent; color: #a20c25; font-size: .86rem; font-weight: 750; cursor: pointer; }
+.clear-month:hover { text-decoration: underline; }
 .empty-state { color: #585858; }
 
 .wall { column-width: 290px; column-gap: 18px; }
