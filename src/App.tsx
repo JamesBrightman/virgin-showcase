@@ -49,8 +49,7 @@ export default function App() {
   return (
     <main>
       <header className="hero">
-        <p className="eyebrow">Virgin Atlantic social wall</p>
-        <h1>Selected social posts.</h1>
+        <h1>Virgin Atlantic social wall</h1>
         <p className="intro">
           An internal view of selected Virgin Atlantic and related social content. Click a post to load its live embed.
         </p>
