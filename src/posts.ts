@@ -89,4 +89,13 @@ export const posts: SocialPost[] = [
     aspectRatio: '4 / 5',
     thumbnail: '/thumbs/virgin-atlantic-afternoon-tea-facebook.jpg',
   },
+  {
+    id: 'tiktok-21f4c762d9',
+    platform: 'tiktok',
+    url: "https://www.tiktok.com/@virginatlantic/video/7583795264217976086?_r=1",
+    title: "A free photobooth worth the hype 📸 Our photobooth at SKATE @somersethouse never misses.",
+    summary: "A free photobooth worth the hype 📸 Our photobooth at SKATE @somersethouse never misses. This is one for your festive bucket list.",
+    aspectRatio: '9 / 16',
+    thumbnail: '/thumbs/tiktok-21f4c762d9.jpg',
+  },
 ];
