@@ -34,10 +34,18 @@ body:
       placeholder: <iframe src="https://www.facebook.com/plugins/post.php?...">
     validations:
       required: false
+  - type: input
+    id: published_date
+    attributes:
+      label: Published date (optional)
+      description: "Use YYYY-MM-DD. Leave blank to detect the date from the public post URL."
+      placeholder: 2026-07-18
+    validations:
+      required: false
   - type: textarea
     id: notes
     attributes:
       label: Notes (optional)
-      description: "Add any useful context for the reviewer. For a Facebook post whose date cannot be detected, include Published date: YYYY-MM-DD here."
+      description: Add any useful context for the reviewer.
     validations:
       required: false

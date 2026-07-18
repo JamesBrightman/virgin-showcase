@@ -40,10 +40,6 @@ function validPublishedDate(value) {
   return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? '' : value;
 }
 
-function publishedDateFromNotes(value) {
-  return value.match(/published date:\s*(\d{4}-\d{2}-\d{2})/i)?.[1] ?? '';
-}
-
 function dateFromTikTokUrl(sourceUrl) {
   const videoId = new URL(sourceUrl).pathname.match(/\/video\/(\d+)/)?.[1];
   if (!videoId) return '';
@@ -202,13 +198,13 @@ async function downloadThumbnail(url, id) {
 const sourceUrl = formValue('Post URL');
 const selectedPlatform = formValue('Platform');
 const facebookEmbedCode = formValue('Facebook embed code (optional)');
-const suppliedPublishedAt = publishedDateFromNotes(formValue('Notes (optional)'));
+const suppliedPublishedAt = formValue('Published date (optional)');
 if (!sourceUrl) throw new Error('A post URL is required.');
 
 const platform = platformFromUrl(sourceUrl, selectedPlatform);
 const metadata = await metadataFor(platform, sourceUrl);
 const publishedAt = suppliedPublishedAt ? validPublishedDate(suppliedPublishedAt) : metadata.publishedAt;
-if (suppliedPublishedAt && !publishedAt) throw new Error('Published date in Notes must use YYYY-MM-DD.');
+if (suppliedPublishedAt && !publishedAt) throw new Error('Published date must use YYYY-MM-DD.');
 const id = `${platform}-${createHash('sha256').update(sourceUrl).digest('hex').slice(0, 10)}`;
 const thumbnail = await downloadThumbnail(metadata.thumbnailUrl, id);
 const embedUrl = platform === 'facebook' ? iframeSource(facebookEmbedCode) : '';
