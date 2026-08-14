@@ -31,7 +31,12 @@ function decodeHtml(value) {
 }
 
 function cleanText(value, limit = 280) {
-  return decodeHtml(value).replace(/\s+/g, ' ').trim().slice(0, limit);
+  const unescaped = value.replace(/\\u([0-9a-f]{4})/gi, (_, code) => String.fromCharCode(Number.parseInt(code, 16)));
+  const decoded = decodeHtml(unescaped);
+  const text = /[âðÂ]/.test(decoded)
+    ? Buffer.from(decoded, 'latin1').toString('utf8')
+    : decoded;
+  return text.replace(/\s+/g, ' ').trim().slice(0, limit);
 }
 
 function validPublishedDate(value) {
@@ -70,6 +75,12 @@ function dateFromPage(page) {
     if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
   }
   return '';
+}
+
+function dateFromDescription(description) {
+  const value = description.match(/\bon ([A-Z][a-z]+ \d{1,2}, \d{4}):/i)?.[1] ?? '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
 }
 
 function titleFromText(value) {
@@ -166,7 +177,7 @@ async function metadataFor(platform, sourceUrl) {
   const platformDate = platform === 'instagram' ? dateFromInstagramUrl(sourceUrl) : '';
   return {
     title: titleFromText(ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio,
-    publishedAt: platformDate || dateFromPage(page),
+    publishedAt: dateFromPage(page) || dateFromDescription(description) || platformDate,
   };
 }
 

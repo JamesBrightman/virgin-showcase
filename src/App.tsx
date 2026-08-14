@@ -220,10 +220,12 @@ export default function App() {
   };
 
   const visiblePosts = useMemo(
-    () => posts.filter((post) => (
-      (filter === 'all' || post.platform === filter)
-      && (!month || post.publishedAt?.startsWith(month))
-    )),
+    () => posts
+      .filter((post) => (
+        (filter === 'all' || post.platform === filter)
+        && (!month || post.publishedAt?.startsWith(month))
+      ))
+      .toSorted((left, right) => (right.publishedAt ?? '').localeCompare(left.publishedAt ?? '')),
     [filter, month],
   );
 
