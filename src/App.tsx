@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Platform } from './posts';
 import { posts } from './posts';
 import { SocialCard } from './SocialCard';
@@ -9,6 +9,13 @@ const filters: Array<{ label: string; value: 'all' | Platform }> = [
   { label: 'TikTok', value: 'tiktok' },
   { label: 'Facebook', value: 'facebook' },
 ];
+
+const monthNames = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+const pickerYears = Array.from(new Set(posts.flatMap((post) => post.publishedAt ? [Number(post.publishedAt.slice(0, 4))] : []))).sort((a, b) => a - b);
 
 function publicAsset(path: string) {
   return `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
@@ -27,14 +34,88 @@ function monthFromUrl() {
   return month && /^\d{4}-\d{2}$/.test(month) ? month : '';
 }
 
+function MonthPicker({ value, onChange }: { value: string; onChange: (month: string) => void }) {
+  const selectedYear = value ? Number(value.slice(0, 4)) : undefined;
+  const selectedMonth = value ? Number(value.slice(5, 7)) : undefined;
+  const [open, setOpen] = useState(false);
+  const [year, setYear] = useState(selectedYear ?? pickerYears.at(-1) ?? new Date().getFullYear());
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const yearIndex = pickerYears.indexOf(year);
+  const selectedLabel = selectedYear && selectedMonth ? `${monthNames[selectedMonth - 1]} ${selectedYear}` : 'All months';
+
+  useEffect(() => {
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, []);
+
+  const chooseMonth = (monthIndex: number) => {
+    onChange(`${year}-${String(monthIndex + 1).padStart(2, '0')}`);
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  return (
+    <div className="month-picker" ref={pickerRef}>
+      <button
+        ref={triggerRef}
+        className="month-picker-trigger"
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen((isOpen) => !isOpen)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M3.5 9.5h17M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V6A1.5 1.5 0 0 1 5 4.5Z" /></svg>
+        <span><small>Filter by month</small><strong>{selectedLabel}</strong></span>
+        <svg className="month-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+      </button>
+      {open && (
+        <div className="month-picker-popover" role="dialog" aria-label="Choose a month">
+          <div className="month-picker-header">
+            <button type="button" aria-label="Previous year" disabled={yearIndex <= 0} onClick={() => setYear(pickerYears[yearIndex - 1])}>‹</button>
+            <select value={year} aria-label="Choose year" onChange={(event) => setYear(Number(event.target.value))}>
+              {pickerYears.map((option) => <option key={option} value={option}>{option}</option>)}
+            </select>
+            <button type="button" aria-label="Next year" disabled={yearIndex === pickerYears.length - 1} onClick={() => setYear(pickerYears[yearIndex + 1])}>›</button>
+          </div>
+          <div className="month-grid" role="grid" aria-label={`Months in ${year}`}>
+            {monthNames.map((name, index) => {
+              const isSelected = selectedYear === year && selectedMonth === index + 1;
+              return <button key={name} className={isSelected ? 'selected' : ''} type="button" role="gridcell" aria-selected={isSelected} onClick={() => chooseMonth(index)}>{name.slice(0, 3)}</button>;
+            })}
+          </div>
+          <button className="month-picker-clear" type="button" onClick={() => { onChange(''); setOpen(false); triggerRef.current?.focus(); }}>Show all months</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TechnicalPage() {
   return (
     <main className="technical-page">
       <header className="technical-hero">
         <p className="technical-kicker">Technical guide</p>
         <h1>Managing social wall content</h1>
-        <p>Use the social-post submission form for the normal review workflow. It creates a pull request, so every addition can be checked before publishing.</p>
       </header>
+
+      <section className="technical-section" aria-labelledby="how-it-works">
+        <h2 id="how-it-works">How it works</h2>
+        <p>The wall starts with lightweight thumbnails. Choose a source or month to narrow the collection, then select any card to load its live Instagram, TikTok, or Facebook content.</p>
+      </section>
 
       <section className="technical-section" aria-labelledby="submit-content">
         <h2 id="submit-content">Add a post</h2>
@@ -69,14 +150,29 @@ function TechnicalPage() {
         </div>
       </section>
 
-      <footer className="technical-footer">
+    </main>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <div className="footer-main">
+        <img className="footer-logo" src={publicAsset('/virgin-atlantic-logo.svg')} alt="Virgin Atlantic" />
+        <nav className="footer-social-links" aria-label="Virgin Atlantic social media">
+          <a href="https://www.instagram.com/virginatlantic/" target="_blank" rel="noreferrer"><img src={publicAsset('/icons/instagram.svg')} alt="Instagram" /></a>
+          <a href="https://www.facebook.com/VirginAtlantic/" target="_blank" rel="noreferrer"><img src={publicAsset('/icons/facebook.svg')} alt="Facebook" /></a>
+          <a href="https://www.tiktok.com/@virginatlantic" target="_blank" rel="noreferrer"><img src={publicAsset('/icons/tiktok.svg')} alt="TikTok" /></a>
+        </nav>
+      </div>
+      <div className="footer-credit">
         <p>Built with love by <a href="https://github.com/JamesBrightman" target="_blank" rel="noreferrer">James Brightman</a></p>
         <a className="github-link" href="https://github.com/JamesBrightman/virgin-showcase" target="_blank" rel="noreferrer">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.21.68-.48v-1.7c-2.78.6-3.37-1.18-3.37-1.18-.46-1.15-1.11-1.46-1.11-1.46-.91-.61.07-.6.07-.6 1 .07 1.54 1.03 1.54 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.61 9.61 0 0 1 12 6.8c.85 0 1.71.12 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.91.68 1.84v2.79c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" /></svg>
           View on GitHub
         </a>
-      </footer>
-    </main>
+      </div>
+    </footer>
   );
 }
 
@@ -170,25 +266,7 @@ export default function App() {
             ))}
           </nav>
           <div className="month-search-panel">
-            <label className="month-field">
-              <span className="month-field-label">Filter by month</span>
-              <span className="month-field-control">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M7 2v3M17 2v3M3.5 9.5h17M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V6A1.5 1.5 0 0 1 5 4.5Z" />
-                </svg>
-                <input
-                  type="month"
-                  value={month}
-                  aria-label="Filter posts by month"
-                  onChange={(event) => selectMonth(event.target.value)}
-                />
-              </span>
-            </label>
-            {month && (
-              <button className="clear-month" type="button" onClick={() => selectMonth('')}>
-                Clear
-              </button>
-            )}
+            <MonthPicker value={month} onChange={selectMonth} />
           </div>
         </div>
       </section>
@@ -201,6 +279,7 @@ export default function App() {
         {visiblePosts.length === 0 && <p className="empty-state">No posts match this filter.</p>}
       </main>
       </>}
+      <SiteFooter />
     </>
   );
 }
