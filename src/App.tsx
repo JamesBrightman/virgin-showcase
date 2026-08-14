@@ -181,7 +181,7 @@ export default function App() {
   const [month, setMonth] = useState(monthFromUrl);
   const basePath = import.meta.env.BASE_URL;
   const technicalPath = `${basePath.replace(/\/$/, '')}/technical`;
-  const isTechnicalPage = window.location.pathname === technicalPath;
+  const isTechnicalPage = window.location.pathname.replace(/\/$/, '') === technicalPath;
 
   useEffect(() => {
     const updateFilter = () => {
