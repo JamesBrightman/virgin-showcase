@@ -48,7 +48,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .technical-link svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
 
 .social-search {
-  padding: 28px 32px;
+  padding: 28px clamp(40px, 5vw, 72px);
   background: var(--brand-red);
 }
 .social-search-content {
@@ -76,7 +76,7 @@ h1 {
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: .8fr 1.25fr 1fr 1.25fr;
   width: min(100%, 640px);
   min-height: 80px;
   gap: 8px;
@@ -85,11 +85,12 @@ h1 {
   background: rgba(102, 0, 42, .32);
 }
 .filter {
+  min-width: 0;
   min-height: 60px;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  padding: 10px 14px;
+  padding: 10px 8px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -113,6 +114,12 @@ h1 {
 .filter:not(.active) .filter-icon:not(.all-icon) { filter: brightness(0) invert(1); }
 .filter:not(.active):hover .filter-icon:not(.all-icon) { filter: brightness(0); }
 .filter.active .filter-icon:not(.all-icon) { filter: brightness(0); }
+
+@media (max-width: 900px) {
+  .social-search-content { align-items: stretch; flex-direction: column; gap: 20px; }
+  .filters { width: min(100%, 640px); }
+  .month-search-panel { align-self: flex-start; }
+}
 .month-search-panel {
   display: flex;
   align-items: center;
@@ -253,6 +260,7 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
 .generated-poster span { font-size: 1.6rem; font-weight: 900; letter-spacing: -.04em; }
 .card-copy { display: grid; gap: 8px; padding: 22px 20px 24px; }
 .card-copy strong { font-size: 1.1875rem; line-height: 1.2; letter-spacing: -.025em; }
+.card-meta { display: flex; align-items: center; justify-content: space-between; min-height: 18px; }
 .platform {
   display: inline-flex;
   width: 18px;
@@ -324,7 +332,7 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
   .footer-main { align-items: flex-start; flex-direction: column; width: min(100% - 40px, 600px); padding: 34px 0; }
   .footer-logo { width: 190px; }
   .footer-credit { align-items: flex-start; flex-direction: column; gap: 12px; width: min(100% - 40px, 600px); }
-  .social-search { padding: 24px 16px; }
+  .social-search { padding: 24px; }
   .social-search-content { align-items: stretch; flex-direction: column; gap: 20px; }
   main { width: min(100% - 32px, 1180px); padding-top: 48px; }
   .filters { min-height: 58px; gap: 4px; padding: 7px; }

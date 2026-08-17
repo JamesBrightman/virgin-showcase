@@ -39,6 +39,14 @@ function cleanText(value, limit = 280) {
   return text.replace(/\s+/g, ' ').trim().slice(0, limit);
 }
 
+function captionFromText(value, limit = 180) {
+  const caption = value
+    .replace(/^\d[\d,.Kk]* likes, \d[\d,.Kk]* comments? - [^-]+ on [^:]+:\s*["']?/, '')
+    .replace(/^\d[\d,.Kk]* views?\s*·\s*\d[\d,.Kk]* reactions?\s*\|\s*/, '')
+    .replace(/^Virgin Atlantic\s*[:|-]\s*/i, '');
+  return cleanText(caption, limit).replace(/\s*["']$/, '');
+}
+
 function validPublishedDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
   const date = new Date(`${value}T00:00:00Z`);
@@ -85,7 +93,7 @@ function dateFromDescription(description) {
 
 function titleFromText(value) {
   const unquoted = value.replace(/^[^:]+:\s*["']?/, '').replace(/["']$/, '');
-  return cleanText(unquoted.split(/(?<=[.!?])\s/)[0], 96) || 'Social post';
+  return captionFromText(unquoted.split(/(?<=[.!?])\s/)[0], 72) || 'Social post';
 }
 
 function platformFromUrl(url, selectedPlatform) {
@@ -158,7 +166,7 @@ async function metadataFor(platform, sourceUrl) {
     const oembed = await response.json();
     const { response: pageResponse } = await fetchPublic(sourceUrl);
     const page = await pageResponse.text();
-    const description = cleanText(page.match(/"desc":"([^"]+)"/)?.[1] ?? oembed.title ?? '');
+    const description = captionFromText(page.match(/"desc":"([^"]+)"/)?.[1] ?? oembed.title ?? '');
     return {
       title: titleFromText(description), summary: description, thumbnailUrl: oembed.thumbnail_url,
       aspectRatio: '9 / 16', publishedAt: dateFromTikTokUrl(sourceUrl) || dateFromPage(page),
@@ -167,7 +175,7 @@ async function metadataFor(platform, sourceUrl) {
 
   const { response, url } = await fetchPublic(sourceUrl);
   const page = await response.text();
-  const description = cleanText(metaValue(page, 'og:description'));
+  const description = captionFromText(metaValue(page, 'og:description'));
   const ogTitle = cleanText(metaValue(page, 'og:title'));
   const thumbnailUrl = metaValue(page, 'og:image');
   if (!thumbnailUrl) throw new Error('The platform did not expose a public preview image.');
@@ -176,7 +184,7 @@ async function metadataFor(platform, sourceUrl) {
     : (url.includes('/reel/') ? '9 / 16' : '4 / 5');
   const platformDate = platform === 'instagram' ? dateFromInstagramUrl(sourceUrl) : '';
   return {
-    title: titleFromText(ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio,
+    title: titleFromText(platform === 'facebook' ? description : ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio,
     publishedAt: dateFromPage(page) || dateFromDescription(description) || platformDate,
   };
 }

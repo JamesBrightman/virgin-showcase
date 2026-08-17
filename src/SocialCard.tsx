@@ -37,8 +37,10 @@ export function SocialCard({ post }: { post: SocialPost }) {
             <PosterVisual post={post} />
           </div>
           <span className="card-copy">
-            <span className="platform" aria-label={platformLabel[post.platform]}>
-              <img src={publicAsset(`/icons/${post.platform}.svg`)} alt="" />
+            <span className="card-meta">
+              <span className="platform" aria-label={platformLabel[post.platform]}>
+                <img src={publicAsset(`/icons/${post.platform}.svg`)} alt="" />
+              </span>
             </span>
             <strong>{post.title}</strong>
             <span className="summary">{post.summary}</span>
