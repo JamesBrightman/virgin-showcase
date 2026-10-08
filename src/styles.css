@@ -227,6 +227,7 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
 
 .wall { column-width: 292px; column-gap: 24px; }
 .card {
+  position: relative;
   break-inside: avoid;
   margin: 0 0 24px;
   overflow: hidden;
@@ -237,13 +238,6 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
   transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
 }
 .card:not(.is-embedded):hover { border-color: #a3a3a3; box-shadow: 0 10px 24px rgba(0, 0, 0, .12); transform: translateY(-2px); }
-.card.is-embedded {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-}
 .preview { width: 100%; border: 0; padding: 0; text-align: left; background: transparent; cursor: pointer; }
 .poster { position: relative; overflow: hidden; background: #e6e6e6; }
 .poster img { width: 100%; height: 100%; display: block; object-fit: cover; }
@@ -259,7 +253,22 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
 .card-facebook .generated-poster { background: linear-gradient(145deg, #85b6ff, #0866ff 60%, #054bbd); color: white; }
 .generated-poster span { font-size: 1.6rem; font-weight: 900; letter-spacing: -.04em; }
 .card-copy { display: grid; gap: 8px; padding: 22px 20px 24px; }
-.card-copy strong { font-size: 1.1875rem; line-height: 1.2; letter-spacing: -.025em; }
+.card-title,
+.summary {
+  position: relative;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+.card-title {
+  color: var(--ink);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
 .card-meta { display: flex; align-items: center; justify-content: space-between; min-height: 18px; }
 .platform {
   display: inline-flex;
@@ -267,32 +276,108 @@ code { padding: .15em .35em; border-radius: 3px; background: #f0f0f0; color: var
   height: 18px;
 }
 .platform img { display: block; width: 100%; height: 100%; }
-.summary { margin-top: 3px; color: var(--muted-ink); font-size: .9375rem; line-height: 1.5; }
-.embed-stage {
-  display: flex;
-  justify-content: center;
-  min-height: 300px;
+.summary {
+  margin-top: 3px;
+  color: var(--muted-ink);
+  font-size: .9375rem;
+  line-height: 1.5;
+  line-clamp: 4;
+  -webkit-line-clamp: 4;
 }
+.card-copy .is-truncated::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding-left: .2em;
+  background: var(--surface);
+  content: '…';
+}
+.embed-stage {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 24px;
+  background: rgba(16, 24, 32, .78);
+}
+.embed-panel {
+  position: relative;
+  width: min(100%, 420px);
+  min-height: 520px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .38);
+}
+.embed-panel-tiktok {
+  width: min(100%, 405px);
+  height: min(82vh, 720px);
+  min-height: 0;
+  background: #111;
+}
+.embed-panel-facebook-reel {
+  width: min(100%, 500px);
+  height: min(82vh, 700px);
+  min-height: 0;
+}
+.embed-panel-facebook {
+  width: min(100%, 700px);
+  height: min(82vh, 760px);
+  min-height: 0;
+}
+.embed-content {
+  width: 100%;
+}
+.embed-content > * {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+.embed-panel-tiktok .embed-content,
+.embed-panel-facebook-reel .embed-content,
+.embed-panel-facebook .embed-content { height: 100%; }
 .tiktok-player {
   width: 100%;
-  aspect-ratio: 9 / 16;
+  height: 100%;
   border: 0;
   border-radius: var(--radius);
   background: #111;
 }
 .facebook-player {
   width: 100%;
+  height: 100%;
   border: 0;
   overflow: hidden;
 }
 .embed-loader {
-  position: relative;
+  position: absolute;
+  z-index: 2;
+  inset: 0;
   display: grid;
   place-items: center;
   overflow: hidden;
-  min-height: 300px;
   background: #e6e6e6;
 }
+.close-embed {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(18, 18, 18, .78);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+.close-embed:hover { background: rgba(18, 18, 18, .95); }
 .embed-loader > img, .embed-loader .generated-poster {
   width: 100%;
   height: 100%;

@@ -183,9 +183,12 @@ async function metadataFor(platform, sourceUrl) {
     ? (url.includes('/reel/') ? '4 / 5' : '1 / 1')
     : (url.includes('/reel/') ? '9 / 16' : '4 / 5');
   const platformDate = platform === 'instagram' ? dateFromInstagramUrl(sourceUrl) : '';
+  const resolvedUrl = platform === 'facebook'
+    ? new URL(url).origin + new URL(url).pathname
+    : sourceUrl;
   return {
     title: titleFromText(platform === 'facebook' ? description : ogTitle || description), summary: description || ogTitle, thumbnailUrl, aspectRatio,
-    publishedAt: dateFromPage(page) || dateFromDescription(description) || platformDate,
+    publishedAt: dateFromPage(page) || dateFromDescription(description) || platformDate, resolvedUrl,
   };
 }
 
@@ -231,7 +234,7 @@ const postsFile = await readFile(postsPath, 'utf8');
 
 if (postsFile.includes(`id: '${id}'`)) throw new Error('This post has already been added.');
 
-const postSource = `  {\n    id: '${id}',\n    platform: '${platform}',\n    url: ${JSON.stringify(sourceUrl)},\n    title: ${JSON.stringify(metadata.title)},\n    summary: ${JSON.stringify(metadata.summary)},${publishedAt ? `\n    publishedAt: '${publishedAt}',` : ''}\n    aspectRatio: '${metadata.aspectRatio}',\n    thumbnail: '${thumbnail}',${embedUrl ? `\n    embedUrl: ${JSON.stringify(embedUrl)},` : ''}\n  },\n`;
+const postSource = `  {\n    id: '${id}',\n    platform: '${platform}',\n    url: ${JSON.stringify(metadata.resolvedUrl ?? sourceUrl)},\n    title: ${JSON.stringify(metadata.title)},\n    summary: ${JSON.stringify(metadata.summary)},${publishedAt ? `\n    publishedAt: '${publishedAt}',` : ''}\n    aspectRatio: '${metadata.aspectRatio}',\n    thumbnail: '${thumbnail}',${embedUrl ? `\n    embedUrl: ${JSON.stringify(embedUrl)},` : ''}\n  },\n`;
 
 const marker = '];\n';
 const position = postsFile.lastIndexOf(marker);

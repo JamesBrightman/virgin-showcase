@@ -1,10 +1,29 @@
 import {
-  FacebookEmbed,
   InstagramEmbed,
 } from 'react-social-media-embed';
 import type { SocialPost } from './posts';
 
-export default function SocialEmbed({ post }: { post: SocialPost }) {
+type SocialEmbedProps = {
+  post: SocialPost;
+  onLoad: () => void;
+  facebookWidth?: number;
+};
+
+function facebookEmbedUrl(post: SocialPost, facebookWidth = 680) {
+  if (post.embedUrl) return post.embedUrl;
+
+  const isReel = post.url.includes('/reel/');
+  const plugin = isReel ? 'video' : 'post';
+  const params = new URLSearchParams({
+    href: post.url,
+    show_text: 'false',
+    width: String(isReel ? 500 : facebookWidth),
+  });
+
+  return `https://www.facebook.com/plugins/${plugin}.php?${params}`;
+}
+
+export default function SocialEmbed({ post, onLoad, facebookWidth }: SocialEmbedProps) {
   switch (post.platform) {
     case 'instagram':
       return <InstagramEmbed url={post.url} width="100%" placeholderImageUrl={post.thumbnail} />;
@@ -22,24 +41,21 @@ export default function SocialEmbed({ post }: { post: SocialPost }) {
           title={post.title}
           allow="fullscreen"
           allowFullScreen
+          onLoad={onLoad}
         />
       );
     }
     case 'facebook':
-      if (post.embedUrl) {
-        return (
-          <iframe
-            className="facebook-player"
-            src={post.embedUrl}
-            title={post.title}
-            height={post.embedHeight ?? 634}
-            scrolling="no"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        );
-      }
-
-      return <FacebookEmbed url={post.url} width="100%" placeholderImageUrl={post.thumbnail} />;
+      return (
+        <iframe
+          className="facebook-player"
+          src={facebookEmbedUrl(post, facebookWidth)}
+          title={post.title}
+          scrolling="no"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          onLoad={onLoad}
+        />
+      );
   }
 }
